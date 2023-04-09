@@ -26,6 +26,37 @@ def run_preprocess():
     )
 
 
+@app.command(
+    "train",
+    help="Process for training tokenizer and language models using preprocessed data"
+)
+def run_train():
+    from train import train
+    local_dir = pathlib.Path(config["DEFAULT"].get("local_dir"))
+    tokenizer_config = config["tokenizer.config"]
+    train(
+        local_dir=local_dir,
+        pad_token_info=(
+            tokenizer_config.getint("pad_token_id"), tokenizer_config.get("pad_token")
+        ),
+        unk_token_info=(
+            tokenizer_config.getint("unk_token_id"), tokenizer_config.get("unk_token")
+        ),
+        cls_token_info=(
+            tokenizer_config.getint("cls_token_id"), tokenizer_config.get("cls_token")
+        ),
+        sep_token_info=(
+            tokenizer_config.getint("sep_token_id"), tokenizer_config.get("sep_token")
+        ),
+        mask_token_info=(
+            tokenizer_config.getint("mask_token_id"), tokenizer_config.get("mask_token")
+        ),
+        vocab_size=tokenizer_config.getint("vocab_size"),
+        result_dir_name=tokenizer_config.get("result_dir"),
+        logger=_make_logger("train"),
+    )
+
+
 def _make_logger(name: str) -> logging.Logger:
     formatter = logging.Formatter(
         fmt="%(asctime)s (%(funcName)s) : %(msg)s",
